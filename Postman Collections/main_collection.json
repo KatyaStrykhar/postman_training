@@ -1,0 +1,618 @@
+{
+	"info": {
+		"_postman_id": "58e2d49f-3b81-4d5a-a916-d8a4389c72ed",
+		"name": "v2_collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "mainFolder",
+			"item": [
+				{
+					"name": "Add New Pet",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9a5f9031-c066-48ff-a787-e09bcf89f6cd",
+								"exec": [
+									"let response = pm.response.text();",
+									"let jsonData = JSON.parse(response);",
+									"let id = jsonData.id;",
+									"",
+									"console.log(\"Pet id is \" + id);",
+									"",
+									"pm.collectionVariables.set(\"petId\", id);",
+									"",
+									"const getTokenRequest = {",
+									"    url: 'https://petstore.swagger.io/v2/pet/' + pm.collectionVariables.get(\"petId\"),",
+									"    method: 'GET',",
+									"    header: {",
+									"        'Content-Type': 'application/json'",
+									"    },",
+									"};",
+									"",
+									"pm.sendRequest(getTokenRequest, function(error, response) {",
+									"",
+									"    pm.test(\"Status code is 200\", function() {",
+									"        pm.expect(response.code == 200).to.equal(true)",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c7a063b4-0bad-43f5-895c-1499eb6b09d6",
+								"exec": [
+									"var randomID = Math.random().toString(8).substring(5);",
+									"console.log(\"pet id: \" + randomID);",
+									"pm.collectionVariables.set(\"petId\", randomID);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"id": "96fd57de-92ef-4588-8042-7ff6e739b1fb",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": {{petId}},\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"{{first_pet_name}}\"\n  },\n  \"name\": \"cat\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"available\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/{{version}}/{{entity}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Image",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "820bfd21-4b7c-4c99-91c7-631d3b4114b3",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "851d5a90-0e3a-40bf-8662-762695847e49",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"id": "6959be02-cb0e-4612-a39c-df529af9edcd",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"value": "@cat.png;type=image/png",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{url}}/{{version}}/{{entity}}/{{petId}}/uploadImage"
+					},
+					"response": []
+				},
+				{
+					"name": "Update An Existing Pet",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "20e178d1-a972-4bc8-9f49-9ee9dab3a568",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "29bca620-fa34-4c87-8443-b64d7726e88e",
+								"exec": [
+									"const getTokenRequest = {",
+									"    url: 'https://petstore.swagger.io/v2/pet/' + pm.collectionVariables.get(\"petId\"),",
+									"    method: 'GET',",
+									"    header: {",
+									"        'Content-Type': 'application/json'",
+									"    },",
+									"};",
+									"",
+									"pm.sendRequest(getTokenRequest, function(error, response) {",
+									"",
+									"    pm.test(\"Name is not dog\", function() {",
+									"        const jsonResp = response.json();",
+									"        console.log(jsonResp.name);",
+									"        pm.expect(jsonResp.name == 'dog').to.equal(false)",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"id": "7e9bf34e-c419-46f7-938d-d397ccc73fd9",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": {{petId}},\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"name\": \"anyway_it_is_cat\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"available\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/{{version}}/{{entity}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Find Pet By Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a61bd8c8-732c-4968-8ec8-cb35bd57f635",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"id": "d159677c-09e1-4386-8ea3-9d8633d2a41b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/{{entity}}/findByStatus?status=available",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"{{entity}}",
+								"findByStatus"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "available"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Pet By ID",
+					"id": "284b2249-8887-4833-a53b-ebc45334ebb2",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{url}}/{{version}}/{{entity}}/{{petId}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Pet With Form Data",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1849f4f0-c625-4b57-8e33-ef5e41ee7c0b",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"id": "9f09986b-d005-442f-9813-0462dd9a34f3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "{{$randomFirstName}}_v2",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "available",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{url}}/{{version}}/{{entity}}/{{petId}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Pet",
+					"id": "5064f391-7dab-46f1-8e41-c0ebe3a64cc7",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{url}}/{{version}}/{{entity}}/{{petId}}"
+					},
+					"response": []
+				}
+			],
+			"id": "edc05f7a-0bd3-4bc6-bcb1-cbf90b745115"
+		},
+		{
+			"name": "noMainFolder",
+			"item": [
+				{
+					"name": "Add New Pet",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "9a5f9031-c066-48ff-a787-e09bcf89f6cd",
+								"exec": [
+									"let response = pm.response.text();",
+									"let jsonData = JSON.parse(response);",
+									"let id = jsonData.id;",
+									"",
+									"console.log(\"Pet id is \" + id);",
+									"",
+									"pm.collectionVariables.set(\"petId\", id);",
+									"",
+									"const getTokenRequest = {",
+									"    url: 'https://petstore.swagger.io/v2/pet/' + pm.collectionVariables.get(\"petId\"),",
+									"    method: 'GET',",
+									"    header: {",
+									"        'Content-Type': 'application/json'",
+									"    },",
+									"};",
+									"",
+									"pm.sendRequest(getTokenRequest, function(error, response) {",
+									"",
+									"    pm.test(\"Status code is 200\", function() {",
+									"        pm.expect(response.code == 200).to.equal(true)",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c7a063b4-0bad-43f5-895c-1499eb6b09d6",
+								"exec": [
+									"var randomID = Math.random().toString(8).substring(5);",
+									"console.log(\"pet id: \" + randomID);",
+									"pm.collectionVariables.set(\"petId\", randomID);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"id": "30757bfc-ea15-492f-b103-369540f75167",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": {{petId}},\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"{{first_pet_name}}\"\n  },\n  \"name\": \"cat\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"available\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/{{version}}/{{entity}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Update An Existing Pet",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "20e178d1-a972-4bc8-9f49-9ee9dab3a568",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "29bca620-fa34-4c87-8443-b64d7726e88e",
+								"exec": [
+									"const getTokenRequest = {",
+									"    url: 'https://petstore.swagger.io/v2/pet/' + pm.collectionVariables.get(\"petId\"),",
+									"    method: 'GET',",
+									"    header: {",
+									"        'Content-Type': 'application/json'",
+									"    },",
+									"};",
+									"",
+									"pm.sendRequest(getTokenRequest, function(error, response) {",
+									"",
+									"    pm.test(\"Name is not dog\", function() {",
+									"        const jsonResp = response.json();",
+									"        console.log(jsonResp.name);",
+									"        pm.expect(jsonResp.name == 'dog').to.equal(false)",
+									"    });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"id": "d91c06e7-ce26-4608-98f0-e839f0377383",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": {{petId}},\n  \"category\": {\n    \"id\": 0,\n    \"name\": \"string\"\n  },\n  \"name\": \"anyway_it_is_cat\",\n  \"photoUrls\": [\n    \"string\"\n  ],\n  \"tags\": [\n    {\n      \"id\": 0,\n      \"name\": \"string\"\n    }\n  ],\n  \"status\": \"available\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{url}}/{{version}}/{{entity}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Find Pet By Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "a61bd8c8-732c-4968-8ec8-cb35bd57f635",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"id": "c82764a2-4467-4304-a9dd-96c576f3592d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/{{version}}/{{entity}}/findByStatus?status=available",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"{{version}}",
+								"{{entity}}",
+								"findByStatus"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "available"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Pet By ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "54dbd10c-7dfd-4c0f-a8de-97fd510a1daf",
+								"exec": [
+									"console.log(new_fork fork)"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"id": "f383ed00-42d8-4ab7-a168-cc610c37cd93",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{url}}/{{version}}/{{entity}}/{{petId}}"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Pet With Form Data",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "1849f4f0-c625-4b57-8e33-ef5e41ee7c0b",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"id": "427d3a5c-0605-4ae6-b655-0257eb338772",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "{{$randomFirstName}}_v2",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "available",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{url}}/{{version}}/{{entity}}/{{petId}}"
+					},
+					"response": []
+				}
+			],
+			"id": "99a02aaa-be6d-4625-8df6-b3c988f7a5ba"
+		},
+		{
+			"name": "folder_to_merge_without_pr",
+			"item": [],
+			"id": "2ca47dd2-c020-4a39-8916-631e810424b9"
+		},
+		{
+			"name": "merge_with_pr_and_merge_changes",
+			"item": [
+				{
+					"name": "New Request",
+					"id": "241b10e0-a2cf-430d-8b2b-fbf5aeab04d8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			],
+			"id": "13c2d092-ef55-4053-b40e-6e6317778b12"
+		},
+		{
+			"name": "check_git_hub",
+			"item": [
+				{
+					"name": "New Request",
+					"id": "646005db-59cd-43b8-a931-638d6d4cb112",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{url}}/{{version}}/{{entity}}"
+					},
+					"response": []
+				}
+			],
+			"id": "fd3f9489-d9e7-42f4-9c28-8744ae69da88"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "d36db013-373d-465e-8361-83ca7fe4f2e7",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "f87a71cd-cb8e-4649-8b82-ef2a7bd2f5eb",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "petId",
+			"value": "111111111111111"
+		},
+		{
+			"key": "version",
+			"value": "v2",
+			"type": "string"
+		},
+		{
+			"key": "first_pet_name",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
